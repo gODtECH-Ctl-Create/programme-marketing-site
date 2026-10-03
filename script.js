@@ -1,7 +1,7 @@
 const CONTACTS = {
-  whatsapp: "",
-  email: "",
-  phone: ""
+  whatsapp: "08140479738",
+  email: "ayoabe24@gmail.com",
+  phone: "08140479738"
 };
 
 const helper = document.querySelector("#contact-helper");
@@ -11,41 +11,39 @@ function normalizePhone(value) {
   return value.replace(/[^\d+]/g, "");
 }
 
+function toWhatsAppNumber(value) {
+  const clean = normalizePhone(value).replace(/^\+/, "");
+  return clean.startsWith("0") ? "234" + clean.slice(1) : clean;
+}
+
 contactLinks.forEach((link) => {
   const type = link.dataset.contact;
+  const raw = CONTACTS[type] || "";
 
-  link.addEventListener("click", (event) => {
-    const raw = CONTACTS[type] || "";
-
-    if (!raw) {
-      event.preventDefault();
-      link.classList.add("is-disabled");
-      if (helper) {
-        helper.textContent =
-          type === "whatsapp"
-            ? "WhatsApp number will be connected here."
-            : type === "email"
-              ? "Email address will be connected here."
-              : "Phone number will be connected here.";
-      }
-      return;
-    }
-
+  if (raw) {
     if (type === "whatsapp") {
-      const digits = normalizePhone(raw).replace(/^\+/, "");
-      link.href = "https://wa.me/" + digits;
+      link.href = "https://wa.me/" + toWhatsAppNumber(raw);
       link.target = "_blank";
       link.rel = "noopener";
-      return;
     }
 
     if (type === "email") {
       link.href = "mailto:" + raw;
-      return;
     }
 
     if (type === "call") {
       link.href = "tel:" + normalizePhone(raw);
+    }
+  }
+
+  link.addEventListener("click", () => {
+    if (!raw && helper) {
+      helper.textContent =
+        type === "whatsapp"
+          ? "WhatsApp number will be connected here."
+          : type === "email"
+            ? "Email address will be connected here."
+            : "Phone number will be connected here.";
     }
   });
 });
